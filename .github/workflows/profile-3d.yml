@@ -1,0 +1,41 @@
+
+name: Generate 3D Contribution Calendar
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Generate 3D Profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Generate 3D Contributions
+        uses: yoshi389111/github-profile-3d-contrib@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: Bboysis
+
+      - name: Commit Generated Images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add profile-3d-contrib/
+
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Update 3D contribution calendar"
+            git push
+          fi
